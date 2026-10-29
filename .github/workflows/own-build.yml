@@ -26,14 +26,21 @@ jobs:
             ~/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties', 'gradle/libs.versions.toml') }}
 
+      - name: List flavors
+        run: |
+          grep -n -A3 "productFlavors" app/build.gradle.kts || true
+
       - name: Assemble debug
         run: |
           chmod +x ./gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
 
+      - name: Show apk tree
+        run: find app/build/outputs -name "*.apk" -printf "%s %p\n"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: file-manager-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/**/*.apk
           if-no-files-found: error
